@@ -72,9 +72,7 @@ The error model under consideration is the site-independent biased Pauli noise o
 
 By default, MWPM decoders rely solely on error probabilities to deduce the error chains given a set of error syndromes. Again, $X$ and $Z$ noise produce error chains in mutually orthogonal directions, and $Y$ noise can be taken as a product of $X$ and $Z$ noise. Taking multi-path summation [10] into account, the error probability of an error chain $E$ is given as
 $$
-\begin{equation}
 	\Pr(E) = \Omega(E) (p_x + p_y)^{w_1(E)}(p_z + p_y)^{w_2(E)}(1 - p_x - p_y - p_z)^{[n - w_1(E) - w_2(E)]}.
-\end{equation}
 $$
 Here, $\Omega(E)$ is the multiplicative factor from multi-path summation, $w_1(E)$ is the weight of $X$ error edges, $w_2(E)$ is the weight of the $Z$ error edges, and $n$ is the total number of qubits. Given the symmetry of $X$ and $Z$ Paulis on the XZZX surface code, we work with $Z$-biased noise and set $p_x = p_y = p_z / \eta$. With some simple manipulations, 
 $$
