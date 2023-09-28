@@ -1,0 +1,23 @@
+name: bp-mwpm-xzzx
+channels:
+  - defaults
+  - numba
+dependencies:
+  - icc_rt
+  - joblib
+  - jupyter
+  - matplotlib
+  - networkx
+  - numba
+  - numpy
+  - pandas
+  - pip
+  - plotly
+  - pylint
+  - python=3
+  - scipy
+  - tqdm
+  - pip:
+    - awkward
+    - gprof2dot
+    - profilehooks
