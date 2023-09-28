@@ -86,7 +86,7 @@ $$\Pr(E) \propto -\left[\sum_{e_1} |e_1| \ln\left(\frac{1 - 2p_x^{(e_1)} - p_z^{
 to take site-dependency into account. For convenience, we denote the $X$ error edge weight for some $e_1$ as $W(X_{e_1})$, and the $Z$ error edge weight for some $e_2$ as $W(Z_{e_2})$. And
 $$W(X_{e_1}) = \ln\left(\frac{1 - 2p_x^{(e_1)} - p_z^{(e_1)}}{2p_x^{(e_1)}}\right) \ \ \ \ \ (7),$$
 $$W(X_{e_2}) = \ln\left(\frac{1 - 2p_x^{(e_2)} - p_z^{(e_2)}}{p_z^{(e_2)} + p_x^{(e_2)}}\right) \ \ \ \ \ (8).$$
-The code base provides three types of decoder: BP, MWPM, and BP+MWPM decoder. The details of choosing decoders and specifying error models can be found in the notebook `tutorial.ipynb` in the root directory. 
+The code base provides three types of decoder: BP, MWPM, and BP+MWPM decoder. The details of choosing decoders and specifying error models can be found in the notebook `demo.ipynb` in the root directory. 
 
 ## Results and Discussion
 
