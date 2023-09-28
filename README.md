@@ -66,48 +66,26 @@ In this work, we consider the XZZX surface code on a rectangular lattice with op
 
 <img src="data/illustration.png"  />
 
-As shown above, data qubits rest upon the vertices of the $d_x$-by-$d_z$ rectangular lattice. Logical operators $X_L$ and $Z_L$ are placed on the boundaries of the lattice. Stabilizers consisting of the XZZX Pauli strings are supported on each blue tile. Error chains created by $X$ and $Z$ noise are mutually orthogonal. 
+As shown above, data qubits rest upon the vertices of the $d_x$ by $d_z$ rectangular lattice. Logical operators $X_L$ and $Z_L$ are placed on the boundaries of the lattice. Stabilizers consisting of the XZZX Pauli strings are supported on each blue tile. Error chains created by $X$ and $Z$ noise are mutually orthogonal. 
 
 The error model under consideration is the site-independent biased Pauli noise on each data qubits. Let $p_x, p_y, p_z$ denote the probability of $X, Y, Z$ Pauli noise respectively, and $\eta > 0$ denote the strength of the bias. The model supports bias in any one of the $X, Y, Z$ Paulis. Let $B \in \{X, Y, Z\}$ be the type of the noise bias with error probability $p$. Then the rest of the two errors are set to both have $p /\eta$ probabilities. For $\eta = 1$, we recover the depolarizing noise channel. For $\eta \rightarrow \infty$, we obtain a pure biased noise in $B$. The total physical error probability $p_{\text{tot}} = p_x + p_y + p_z$. 
 
 By default, MWPM decoders rely solely on error probabilities to deduce the error chains given a set of error syndromes. Again, $X$ and $Z$ noise produce error chains in mutually orthogonal directions, and $Y$ noise can be taken as a product of $X$ and $Z$ noise. Taking multi-path summation [10] into account, the error probability of an error chain $E$ is given as
-$$
-	\Pr(E) = \Omega(E) (p_x + p_y)^{w_1(E)}(p_z + p_y)^{w_2(E)}(1 - p_x - p_y - p_z)^{[n - w_1(E) - w_2(E)]}.
-$$
+$$\Pr(E) = \Omega(E) (p_x + p_y)^{w_1(E)}(p_z + p_y)^{w_2(E)}(1 - p_x - p_y - p_z)^{[n - w_1(E) - w_2(E)]} \ \ \ \ \ (1).$$
 Here, $\Omega(E)$ is the multiplicative factor from multi-path summation, $w_1(E)$ is the weight of $X$ error edges, $w_2(E)$ is the weight of the $Z$ error edges, and $n$ is the total number of qubits. Given the symmetry of $X$ and $Z$ Paulis on the XZZX surface code, we work with $Z$-biased noise and set $p_x = p_y = p_z / \eta$. With some simple manipulations, 
-$$
-\begin{equation}
-	\Pr(E) \propto- \left[\sum_{e_1} |e_1| \ln(\frac{1 - 2p_x - p_z}{2p_x}) + 
-	\sum_{e_2} |e_2| \ln(\frac{1 - 2p_x - p_z}{p_z + p_x}) - \sum_{e} \ln \Omega(e) \right], 
-\end{equation}
-$$
+$$\Pr(E) \propto -\left[\sum_{e_1} |e_1| \ln\left(\frac{1 - 2p_x - p_z}{2p_x}\right) + \sum_{e_2} |e_2| \ln\left(\frac{1 - 2p_x - p_z}{p_z + p_x}\right) - \sum_{e} \ln \Omega(e) \right] \ \ \ \ \ (2),$$
 where $e_1 \in \{X \text{ error edges}\}$, $e_2 \in \{Z \text{ error edges}\}$, and $e \in \{\text{error edges of } E\}$. The MWPM decoder uses the probability for each error chain as the distance between two syndromes. By minimizing the overall distance, the MWPM decoder finds a most likely set of error chains corresponding to the given syndrome set. 
 
 BP takes the Tanner graph of the XZZX surface code as input and outputs tailored error probability distributions for each qubit on the surface code. In the Tanner graph, each qubit corresponds to a qubit vertex $q$ and each stabilizer checker corresponds to a check vertex $c$. The graph is initialized with a set of beliefs for each qubit $q$ as $[1 - (p_x + p_y + p_z), p_x, p_y, p_z]$. Then the algorithm updates the beliefs in each round via message-passing among neighboring qubit and check vertices according to the following formulae, 
-$$
-\begin{align}
-	m_{c \rightarrow q}(E_q) &\propto \sum_{\substack{E_{q'} \\ q' \in n(c) \backslash q}} \left(\delta_{s_c, S_c \cdot E_c} \prod_{q' \in n(c) \backslash q} m_{q' \rightarrow c} (E_{q'})\right), \\
-	m_{q \rightarrow c}(E_q) &\propto p(E_q) \left(\prod_{c' \in n(q) \backslash c} m_{c' \rightarrow q} (E_{q})\right). \\
-\end{align}
-$$
+$$m_{c \rightarrow q}(E_q) \propto \sum_{E_{q'}, \ q' \in n(c) \backslash q} \left(\delta_{s_c, S_c \cdot E_c} \prod_{q' \in n(c) \backslash q} m_{q' \rightarrow c} (E_{q'})\right) \ \ \ \ \ (3),$$ 
+$$m_{q \rightarrow c}(E_q) \propto p(E_q) \left(\prod_{c' \in n(q) \backslash c} m_{c' \rightarrow q} (E_{q})\right) \ \ \ \ \ (4). $$
 Detailed explanations of these formulae and BP can be found in [11]. Once BP converges (and it does in our case), the belief for each qubit $q$ is updated as
-$$
-b_q(E_q) = p_q(E_q) \prod_{c \in n(q)} m_{c \rightarrow q} (E_q).
-$$
+$$b_q(E_q) = p_q(E_q) \prod_{c \in n(q)} m_{c \rightarrow q} (E_q) \ \ \ \ \ (5).$$
 The updated beliefs are essentially error probability distributions for each qubit $q$ and in general varies among different qubits. In the BP+MWPM decoder, these qubit-dependent beliefs are used instead of the site-independent error probability, and Eqn (2) subsequently becomes
-$$
-\begin{equation}
-	\Pr(E) \propto- \left[\sum_{e_1} |e_1| \ln(\frac{1 - 2p_x^{(e_1)} - p^{(e_1)}_z}{2p^{(e_1)}_x}) + 
-	\sum_{e_2} |e_2| \ln(\frac{1 - 2p^{(e_2)}_x - p^{(e_2)}_z}{p^{(e_2)}_z + p^{(e_2)}_x}) - \sum_{e} \ln \Omega(e) \right]
-\end{equation}
-$$
+$$\Pr(E) \propto -\left[\sum_{e_1} |e_1| \ln\left(\frac{1 - 2p_x^{(e_1)} - p_z^{(e_1)}}{2p_x^{(e_1)}}\right) + \sum_{e_2} |e_2| \ln\left(\frac{1 - 2p_x^{(e_2)} - p_z^{(e_2)}}{p_z^{(e_2)} + p_x^{(e_2)}}\right) - \sum_{e} \ln \Omega(e) \right] \ \ \ \ \ (6),$$
 to take site-dependency into account. For convenience, we denote the $X$ error edge weight for some $e_1$ as $W(X_{e_1})$, and the $Z$ error edge weight for some $e_2$ as $W(Z_{e_2})$. And
-$$
-\begin{align}
-	W(X_{e_1}) &= \ln(\frac{1 - 2p_x^{(e_1)} - p^{(e_1)}_z}{2p^{(e_1)}_x}), \\
-	W(Z_{e_2}) &= \ln(\frac{1 - 2p^{(e_2)}_x - p^{(e_2)}_z}{p^{(e_2)}_z + p^{(e_2)}_x}).
-\end{align}
-$$
+$$W(X_{e_1}) = \ln\left(\frac{1 - 2p_x^{(e_1)} - p_z^{(e_1)}}{2p_x^{(e_1)}}\right) \ \ \ \ \ (7),$$
+$$W(X_{e_2}) = \ln\left(\frac{1 - 2p_x^{(e_2)} - p_z^{(e_2)}}{p_z^{(e_2)} + p_x^{(e_2)}}\right) \ \ \ \ \ (8).$$
 The code base provides three types of decoder: BP, MWPM, and BP+MWPM decoder. The details of choosing decoders and specifying error models can be found in the notebook `tutorial.ipynb` in the root directory. 
 
 ## Results and Discussion
@@ -133,9 +111,7 @@ However, this naive countermeasure also erases all the information obtained from
 As shown above, the proportion of negative edge weights grows with biases. One the one hand, the physical error rate of interest increases with biases; on the other hand, as the XZZX surface code further decouples into stacks of repetition codes, BP’s beliefs about the possible errors on qubits become sharper, resulting in a bimodal distribution at $\eta=200$. With further increasement of the bias, we speculate that the peaks of the bimodal distribution will become smaller. 
 
 Some attempts at recovering the lost information have been made. In particular, we find that by using an activation function [13] of the form 
-$$
-S(W) = \frac{10}{1 + \exp(-0.5(W - 5))}
-$$
+$$S(W) = \frac{10}{1 + \exp(-0.5(W - 5))} \ \ \ \ \ (9)$$
 to remap the edge weights, the error correction threshold up to $\sim 10^2$ for the BP+MWPM decoder can be brought to at least the same level with the MWPM decoder. 
 
 As a side note, we also comment that some naive solutions to the negative edge weight problem do not work. Some people believe that adding an overall shift $\alpha = |\min(\{W\})|$ to all the edge weights can set the minimum of the edge weights to be $0$ and resolve the problem. However, note that in Eqn (6), $\Pr(E)$ is determined by sums of multiple edge weights. This overall shift necessarily penalize longer error chains without a good theoretical reason. In simulations, this solution also does not result in performance improvements. 
@@ -158,7 +134,7 @@ However, I am not sure whether restraining graph topology would yield a possible
 
 ### Formulation 2: 
 
-Returning back to the issue of remapping the weight distribution function, the problem can be reformulated as: given a (bimodal) distribution $D$ on $\R$, does there exist a map $M: \R \rightarrow \R$ s.t. $M(D)$ is defined on $\R_{\geq 0}$ and for any two subsets of weights $W_1$ and $W_2$ by $D$, $\sum_{x \in W_1} x \geq \sum_{x \in W_2} x$ iff $\sum_{x \in M(W_1)} x \geq \sum_{x \in M(W_2)} x$?
+Returning back to the issue of remapping the weight distribution function, the problem can be reformulated as: given a (bimodal) distribution $D$ on $\mathbb R$, does there exist a map $M: \mathbb R \rightarrow \mathbb R$ s.t. $M(D)$ is defined on $\mathbb R_{\geq 0}$ and for any two subsets of weights $W_1$ and $W_2$ by $D$, $\sum_{x \in W_1} x \geq \sum_{x \in W_2} x$ iff $\sum_{x \in M(W_1)} x \geq \sum_{x \in M(W_2)} x$?
 
 ## Acknowledgement
 
